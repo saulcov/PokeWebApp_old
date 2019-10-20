@@ -6,8 +6,11 @@ def fetch(url):
     return None if r.status_code != 200 else r.json()
 
 class Pokemon:
+    count = 807
+
     def __init__(self, id):
         self.url = f'http://pokeapi.co/api/v2/pokemon-species/{id}'
+        self.name = fetch(self.url)['name']
 
     # Creates a description of the pokemon, based on the entries of various pokedex entries
     def describe(self):
@@ -35,7 +38,7 @@ class Tokenize(list):
 
     def __init__(self, doc):
         punctuations = [",","(",")","[","]","{","}","#","@","!",":",";",".","?","’"]
-        tokens = word_tokenize(doc)
+        tokens = word_tokenize(doc.lower())
         for t in tokens:
             if t not in punctuations and not t.isdigit():
                 self.append(t)
@@ -82,7 +85,6 @@ def test_Tokenize(r = False):
 from math import log, log2
 
 class Vectorize(dict):
-
     def __init__(self, tokens):
         for t in tokens:
             if t in self.keys():
@@ -100,6 +102,11 @@ class Vectorize(dict):
     def dNorm(self, K):
         maxCount = max(self.values())
         return {t : K+(1-K)*(v/maxCount) for t, v in self.items()}
+
+    def tfidf(self, iidx): #tf-idf score
+        total = sum(self.values())  # total = sum of counts
+        idf = iidx.idf()            # (term : idf)
+        return {t : (v/total)*idf[t] for t, v in self.items()}
 
 def test_Vectorize(r = False):
     tokens = test_Tokenize(True)
@@ -120,24 +127,43 @@ class InvertedIndex(dict):
                 self[t] = [label]
         return self
 
-    def df(self):
-        doc_freq = {}
-        numTerms = len(self)
-        for t, v in self.items():
-            doc_freq[t] = log2(numTerms/len(v))
-        return doc_freq
-        
+class IDF(dict):
+    def __init__(self, iidx):
+        numTerms = len(iidx)
+        for t, v in iidx.items():
+            self[t] = log2(numTerms/len(v))
+
+    def score(self, doc, sQ):
+        tD = Tokenize(doc) #HERE
+        vD = Vectorize(tD).tf()
+        score = 0
+        for t in sQ:
+            if t in vD.keys():
+                score += vD[t]*self[t]
+        return score
 
 def test_InvertedIndex():
     iidx = InvertedIndex()
     print('--------------------------------------------------------------')
-    for id in range(1,31):
+    for id in range(1,101):
         pokemon = Pokemon(id)
         doc = pokemon.describe()
-        tokens = Tokenize(doc).Snowball()
+        tokens = Tokenize(doc)  #HERE
         dV = Vectorize(tokens)
         iidx.add(dV, id)
-    print(f'Inverted Index after adding doc {id}:\n\t{iidx}\n')
-    print(f'this index has doc-freq:\n\t{iidx.df()}\n')
+        print(f'Scanning Pokemon {id:3}: {pokemon.name}')
+    #print(f'Inverted Index after adding doc {id}:\n\t{iidx}\n')
+    #print(f'this index has doc-freq:\n\t{iidx.idf()}\n')
+    #print('Q = a small yellow pokemon that resembles a mouse')
+    Q = 'electric type pokemons that are also ground type'
+    #Q = 'It has small electric sacs on both its cheeks. If threatened, it looses electric charges from the sacs'
+    sQ = set(Tokenize(Q)) #HERE
+    idf = IDF(iidx)
+    #print(f'IDF is:\n\t{idf}\n')
+    for id in range(1,101):
+        doc = Pokemon(id).describe()
+        print(f'Score of Q in pokemon {id} is: {idf.score(doc, sQ)}')
+
+
 
 test_InvertedIndex()
