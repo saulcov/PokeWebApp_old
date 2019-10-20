@@ -45,7 +45,7 @@ class Tokenize(list):
 
 ## Testing file
 def testing():
-    Q = 'It can go for days without eating a single morsel. In the bulb on its back, it stores energy.'
+    Q = 'In the bulb on its back, it stores energy.'
     tokens = Tokenize(Q)
     print(f'Clean Tokens:\n\t{tokens}\n')
     print(f'No Stop Words:\n\t{tokens.rm_stopwords()}\n')
