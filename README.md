@@ -9,3 +9,6 @@ is used to tokenize a given document by removing punctuation (default). It can a
 
 Vectorization.py
 is used to turn an array of tokens to a dictionary, which will be treated as a vector, by default it returns a dictionary (token : raw count). Can also provide other common term-frequency measures such as: relative frequency, log normalization, and double k-normalization. As defined on (https://en.wikipedia.org/wiki/Tf–idf)
+
+InvertedIndex.py
+is used to continously populate an indverted index, containing pairs (tokens : [Doc list]). When closed it saves itself into a pickle, as demonstraded by running testing() then testing2().
