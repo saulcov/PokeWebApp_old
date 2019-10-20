@@ -1,5 +1,5 @@
 ## Vectorizes an array of tokens based on term count by default
-from math import log, log2
+from math import log
 
 class Vectorize(dict):
     # Default: pairs a token to its raw count on the array
