@@ -24,6 +24,7 @@ class Vectorize(dict):
         maxCount = max(self.values())
         return {t : K+(1-K)*(v/maxCount) for t, v in self.items()}
 
+## Testing file
 def testing():
     tokens = ['it', 'is', 'what', 'it', 'is']
     dV = Vectorize(tokens)
