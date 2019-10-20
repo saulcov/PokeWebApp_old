@@ -1,5 +1,4 @@
-## Preprocessing PokeAPI data
-#  generates a description for a pokemon given its ID in a certain region
+## Generates a description for a pokemon given its ID in a certain region
  
 import requests
 
@@ -38,7 +37,7 @@ class Pokemon:
                 descriptions |= {x['flavor_text']}
         return ' '.join(descriptions)
 
-## Testing for file
+## Testing file
 def sample_doc(id):
     Pokemon.set_region('kanto')
     print(f'Pokedex region set to {Pokemon.pokedex.capitalize()}, containing {Pokemon.count} pokemon species.')
